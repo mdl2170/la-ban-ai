@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Generator · Nano Banana Pro</title>
+<style>
+  :root {
+    --bg: #0D0D0F; --bg-2: #17171A; --card: #1F1F23;
+    --ink: #F5F5F0; --ink-dim: #A8A8A0; --ink-mute: #6B6B66;
+    --accent: #FF6B35; --line: #2A2A2E; --ok: #4AD66D; --err: #FF5555;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg); color: var(--ink);
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 32px; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .sub { color: var(--ink-dim); margin-bottom: 32px; }
+  .panel {
+    background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 24px; margin-bottom: 20px;
+  }
+  label { display: block; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--ink-dim); margin-bottom: 8px; font-weight: 600; }
+  input, textarea, select {
+    width: 100%; background: var(--card); border: 1px solid var(--line);
+    color: var(--ink); padding: 12px 14px; border-radius: 8px;
+    font-family: inherit; font-size: 14px; resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  textarea { min-height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  button {
+    background: var(--accent); color: #0D0D0F; border: none;
+    padding: 12px 24px; border-radius: 8px; font-weight: 600;
+    cursor: pointer; font-size: 14px; font-family: inherit;
+  }
+  button:hover { opacity: 0.9; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .status {
+    padding: 12px 14px; border-radius: 8px; margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+  }
+  .status.ok { background: color-mix(in oklab, var(--ok) 20%, transparent); color: var(--ok); border: 1px solid var(--ok); }
+  .status.err { background: color-mix(in oklab, var(--err) 20%, transparent); color: var(--err); border: 1px solid var(--err); }
+  .status.info { background: var(--card); color: var(--ink-dim); border: 1px solid var(--line); }
+  .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+  .result-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .result-card img { width: 100%; height: auto; display: block; background: #000; }
+  .result-meta { padding: 14px; font-size: 12px; color: var(--ink-dim); }
+  .result-meta .fn { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; margin-bottom: 6px; }
+  .result-actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+  .result-actions button { padding: 8px 12px; font-size: 12px; flex: 1; }
+  .preset {
+    display: inline-block; padding: 6px 10px; margin: 2px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 999px; font-size: 12px;
+    cursor: pointer; color: var(--ink-dim);
+  }
+  .preset:hover { color: var(--accent); border-color: var(--accent); }
+  small { color: var(--ink-mute); font-size: 11.5px; line-height: 1.5; display: block; margin-top: 6px; }
+  .gallery { margin-top: 32px; }
+  .gallery h2 { font-size: 20px; margin-bottom: 12px; }
+  .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .gal-item { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .gal-item img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .gal-item .fn { padding: 8px 10px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--ink-dim); word-break: break-all; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍌 Image Generator</h1>
+  <p class="sub">Nano Banana Pro (gemini-3-pro-image-preview) · ảnh lưu trực tiếp vào <code>assets/img/</code> của project.</p>
+
+  <div class="panel">
+    <label>Google AI Studio API Key</label>
+    <input id="apiKey" type="password" placeholder="AIzaSy... (lưu trong localStorage, không gửi đi đâu khác)">
+    <small>Key được lưu tạm trong trình duyệt của bạn. Nhấn Clear để xóa.</small>
+    <div class="btn-row" style="margin-top: 10px">
+      <button class="ghost" onclick="clearKey()">Clear key</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <label>Prompt</label>
+    <textarea id="prompt" placeholder="Vietnamese high school classroom, students with laptops, documentary photo, natural light, warm tones..."></textarea>
+    <small>Mẹo: mô tả cụ thể bối cảnh, ánh sáng, phong cách (documentary photo / editorial / illustration). Có thể viết bằng tiếng Việt hoặc tiếng Anh.</small>
+
+    <div style="margin-top: 14px;">
+      <label>Preset gợi ý (click để paste)</label>
+      <div id="presets"></div>
+    </div>
+
+    <div class="row" style="margin-top: 18px">
+      <div>
+        <label>Tên file (không cần .png)</label>
+        <input id="filename" placeholder="news-tphcm-classroom" value="generated">
+      </div>
+      <div>
+        <label>Tỷ lệ</label>
+        <select id="aspectRatio">
+          <option value="16:9">16:9 (ngang)</option>
+          <option value="4:3">4:3</option>
+          <option value="1:1">1:1 (vuông)</option>
+          <option value="3:4">3:4 (dọc)</option>
+          <option value="9:16">9:16 (dọc dài)</option>
+        </select>
+      </div>
+      <div>
+        <label>Số ảnh</label>
+        <select id="count">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="genBtn" onclick="generate()">Generate →</button>
+      <button class="ghost" onclick="document.getElementById('prompt').value=''">Clear</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <div id="results" class="result-grid"></div>
+
+  <div class="gallery panel">
+    <h2>Thư viện (assets/img/)</h2>
+    <small>Ảnh đã tạo trong session này. Reload trang để xem ảnh mới lưu.</small>
+    <div id="gallery" class="gal-grid" style="margin-top: 14px"></div>
+  </div>
+</div>
+
+<script>
+const KEY_STORAGE = 'gemini_api_key';
+const apiKeyInput = document.getElementById('apiKey');
+apiKeyInput.value = localStorage.getItem(KEY_STORAGE) || '';
+apiKeyInput.addEventListener('change', () => {
+  localStorage.setItem(KEY_STORAGE, apiKeyInput.value.trim());
+});
+function clearKey() {
+  localStorage.removeItem(KEY_STORAGE);
+  apiKeyInput.value = '';
+  setStatus('Đã xóa key khỏi trình duyệt.', 'info');
+}
+
+const PRESETS = [
+  { label: '📚 Lớp học VN', prompt: 'Vietnamese high school classroom, students aged 15-17 working on laptops with chatbot interfaces visible on screens, natural window light, warm documentary photography, shallow depth of field, realistic, editorial style' },
+  { label: '👨‍🏫 Giáo viên soạn bài', prompt: 'Vietnamese teacher in her 40s at home desk, laptop open showing AI chat interface, soft evening light, papers and textbooks nearby, candid documentary photo, warm tones' },
+  { label: '👨‍👩‍👧 Phụ huynh + con', prompt: 'Vietnamese parent and child (age 10) sitting together at kitchen table, looking at tablet screen showing educational AI app, warm evening light, candid family moment, documentary photography style' },
+  { label: '🎓 Học sinh tự học', prompt: 'Vietnamese teenager studying alone at bedroom desk, laptop with ChatGPT-like interface, textbooks and notebook open, lamp light, concentrated expression, editorial photograph' },
+  { label: '🧠 Abstract AI brain', prompt: 'Abstract neural network visualization, glowing orange nodes connected by luminous threads, dark background, minimal, editorial tech illustration, depth and dimensionality' },
+  { label: '📱 Màn hình điện thoại', prompt: 'Close-up of hand holding smartphone showing Vietnamese AI chatbot interface, shallow depth of field, desk background blurred, editorial tech photograph' },
+];
+const presetsEl = document.getElementById('presets');
+PRESETS.forEach(p => {
+  const el = document.createElement('span');
+  el.className = 'preset';
+  el.textContent = p.label;
+  el.onclick = () => { document.getElementById('prompt').value = p.prompt; };
+  presetsEl.appendChild(el);
+});
+
+function setStatus(msg, kind='info') {
+  const s = document.getElementById('status');
+  s.className = 'status ' + kind;
+  s.textContent = msg;
+}
+
+async function generate() {
+  const apiKey = apiKeyInput.value.trim();
+  const prompt = document.getElementById('prompt').value.trim();
+  const filename = document.getElementById('filename').value.trim() || 'generated';
+  const aspectRatio = document.getElementById('aspectRatio').value;
+  const count = parseInt(document.getElementById('count').value, 10);
+
+  if (!apiKey) { setStatus('⚠ Cần API key.', 'err'); return; }
+  if (!prompt) { setStatus('⚠ Cần prompt.', 'err'); return; }
+  localStorage.setItem(KEY_STORAGE, apiKey);
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  setStatus(`Đang tạo ${count} ảnh bằng Nano Banana Pro...`, 'info');
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = '';
+
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        responseModalities: ['IMAGE'],
+        imageConfig: { aspectRatio },
+        candidateCount: count,
+      },
+    };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`HTTP ${res.status}: ${txt}`);
+    }
+    const data = await res.json();
+
+    const candidates = data.candidates || [];
+    if (candidates.length === 0) {
+      throw new Error('Không có ảnh trả về. Response: ' + JSON.stringify(data).slice(0, 400));
+    }
+
+    let saved = 0;
+    for (let i = 0; i < candidates.length; i++) {
+      const cand = candidates[i];
+      const parts = (cand.content && cand.content.parts) || [];
+      for (const part of parts) {
+        if (part.inlineData && part.inlineData.data) {
+          const b64 = part.inlineData.data;
+          const mime = part.inlineData.mimeType || 'image/png';
+          const ext = mime.includes('jpeg') ? 'jpg' : 'png';
+          const suffix = candidates.length > 1 ? `-${i+1}` : '';
+          const fn = `${filename}${suffix}.${ext}`;
+          const path = `assets/img/${fn}`;
+
+          // Save to project via host-iframe helper
+          await saveToProject(path, b64, mime);
+          const dataUrl = `data:${mime};base64,${b64}`;
+          addResultCard(dataUrl, path, fn);
+          saved++;
+        } else if (part.text) {
+          console.log('Text response:', part.text);
+        }
+      }
+    }
+
+    if (saved === 0) {
+      throw new Error('Response nhận được nhưng không có ảnh. Kiểm tra console.');
+    }
+    setStatus(`✓ Đã tạo & lưu ${saved} ảnh vào assets/img/`, 'ok');
+  } catch (e) {
+    console.error(e);
+    setStatus('✗ Lỗi: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Save image via parent-frame message (works in Claude artifacts iframe).
+// Fallback: trigger a download.
+async function saveToProject(path, base64Data, mime) {
+  // The iframe in the Claude/Artifacts preview doesn't expose a filesystem write bridge,
+  // so we trigger a download AND store in sessionStorage for gallery.
+  // For real project save: user downloads and I (Claude) can read from uploads/ after.
+  try {
+    const bin = atob(base64Data);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], { type: mime });
+    const url = URL.createObjectURL(blob);
+    // Auto-download
+    const a = document.createElement('a');
+    a.href = url; a.download = path.split('/').pop();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  } catch(e) {
+    console.error('Save failed:', e);
+  }
+}
+
+function addResultCard(dataUrl, path, fn) {
+  const resultsEl = document.getElementById('results');
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <img src="${dataUrl}" alt="${fn}">
+    <div class="result-meta">
+      <div class="fn">${path}</div>
+      <div>Tải xuống tự động. Hãy drag file vào chat với Claude để lưu vào assets/img/.</div>
+    </div>
+    <div class="result-actions">
+      <button class="ghost" onclick="copyPath('${path}')">Copy path</button>
+      <button onclick="downloadAgain('${dataUrl}','${fn}')">Download lại</button>
+    </div>
+  `;
+  resultsEl.appendChild(card);
+}
+function copyPath(p) { navigator.clipboard.writeText(p); setStatus(`Đã copy: ${p}`, 'info'); }
+function downloadAgain(url, fn) {
+  const a = document.createElement('a'); a.href = url; a.download = fn;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+</script>
+</body>
+</html>

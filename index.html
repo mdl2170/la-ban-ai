@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Bàn AI — Định hướng trong kỷ nguyên AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+/* ---------- HERO ---------- */
+.hero {
+  padding: 56px 0 120px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.hero-bg canvas { width: 100%; height: 100%; display: block; }
+.hero-bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 55% at 20% 40%, transparent 0%, color-mix(in oklab, var(--bg) 40%, transparent) 70%),
+    linear-gradient(180deg, transparent 0%, var(--bg) 95%);
+}
+.hero > .container { position: relative; z-index: 1; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: center;
+  min-height: 620px;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: var(--card);
+  margin-bottom: 28px;
+}
+.hero-eyebrow .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 10px var(--ok);
+}
+.hero h1 {
+  font-size: clamp(72px, 11vw, 172px);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  margin-bottom: 28px;
+  background: linear-gradient(180deg, var(--ink) 55%, color-mix(in oklab, var(--ink) 60%, transparent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero h1 .underline {
+  color: var(--accent);
+  -webkit-text-fill-color: var(--accent);
+  font-style: italic;
+  font-weight: 500;
+}
+.hero p.sub {
+  font-size: clamp(16px, 1.4vw, 19px);
+  color: var(--ink-dim);
+  max-width: 520px;
+  margin-bottom: 36px;
+  line-height: 1.55;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-visual {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 60%),
+    radial-gradient(100% 80% at 0% 100%, color-mix(in oklab, var(--cool) 30%, transparent), transparent 60%),
+    var(--bg-2);
+  border: 1px solid var(--line);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hv-tag {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.hv-body {
+  background: color-mix(in oklab, var(--bg) 60%, transparent);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+}
+.hv-body h3 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+.hv-body p { color: var(--ink-dim); font-size: 14px; }
+.hv-compass {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.hv-compass svg { width: 72%; height: auto; opacity: 0.55; }
+.hv-compass .compass-ring { transform-origin: 100px 100px; animation: compassPulse 6s ease-in-out infinite; }
+.hv-compass .compass-needle { transform-origin: 100px 100px; animation: compassSpin 9s cubic-bezier(.45,.05,.55,.95) infinite; }
+.hv-compass .compass-ticks { transform-origin: 100px 100px; animation: compassTicksSpin 24s linear infinite; }
+@keyframes compassSpin {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(138deg); }
+  35%  { transform: rotate(118deg); }
+  55%  { transform: rotate(226deg); }
+  70%  { transform: rotate(212deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes compassTicksSpin { to { transform: rotate(-360deg); } }
+@keyframes compassPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hv-compass .compass-needle, .hv-compass .compass-ticks, .hv-compass .compass-ring { animation: none; }
+}
+
+/* ---------- STATS ---------- */
+.stats {
+  background: var(--bg-2);
+}
+.stats-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 56px; }
+.stats-head h2 {
+  font-size: clamp(32px, 4vw, 52px);
+  max-width: 620px;
+}
+.stats-head p { color: var(--ink-dim); max-width: 360px; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.stat {
+  background: var(--bg-2);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  position: relative;
+}
+.stat .num {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 9vw, 132px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  color: var(--accent);
+}
+.stat .num .unit { font-size: 0.4em; color: var(--ink-dim); font-weight: 500; margin-left: 4px; }
+.stat h3 { font-size: 18px; margin-bottom: 6px; }
+.stat p { color: var(--ink-dim); font-size: 13.5px; }
+.stat .src {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ---------- NEWS ---------- */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 56px;
+}
+.news {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+.news .thumb {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+.news .thumb .ph {
+  position: absolute; inset: 0; border: none; border-radius: inherit;
+}
+.news .badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.news .badge::before {
+  content: ""; width: 16px; height: 1px; background: var(--accent);
+}
+.news h3 {
+  font-size: 19px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.news .meta {
+  color: var(--ink-mute);
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- RANKINGS ---------- */
+.rankings {
+  background:
+    radial-gradient(60% 40% at 100% 0%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%),
+    var(--bg);
+}
+.rank-table {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 48px;
+}
+.rank-row {
+  display: grid;
+  grid-template-columns: 60px 1.4fr 1.8fr 1fr 1.4fr 1.6fr 60px;
+  gap: 24px;
+  padding: 22px 28px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  transition: background 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+.rank-row:first-child { border-top: none; }
+.rank-row.head {
+  background: var(--card);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+a.rank-row:hover { background: var(--card); }
+.rank-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink-mute);
+  letter-spacing: -0.02em;
+}
+.rank-row.top .rank-num { color: var(--accent); }
+.tool-name { font-weight: 600; font-size: 16.5px; display: flex; align-items: center; gap: 12px; }
+.tool-logo {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+  color: var(--accent-ink);
+}
+.stars { display: flex; gap: 2px; color: var(--accent); }
+.stars .dim { color: var(--line); }
+.arrow { color: var(--ink-mute); font-size: 18px; transition: transform 0.2s; }
+a.rank-row:hover .arrow { transform: translateX(4px); color: var(--accent); }
+
+/* ---------- AUDIENCE PICKER ---------- */
+.audience {
+  background: var(--bg-2);
+}
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 64px;
+}
+.aud-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 3 / 4;
+  padding: 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  background: var(--bg);
+}
+.aud-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(80% 60% at 50% 100%, var(--aud-color), transparent 65%);
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.aud-card:hover { transform: translateY(-4px); border-color: var(--aud-color); }
+.aud-card:hover::before { opacity: 0.55; }
+.aud-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.aud-title {
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  margin: auto 0;
+  position: relative;
+  z-index: 1;
+}
+.aud-title .en { display: block; font-size: 0.28em; color: var(--ink-mute); font-family: var(--font-mono); letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; margin-bottom: 12px; }
+.aud-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--ink-dim); font-size: 13.5px;
+  position: relative; z-index: 1;
+}
+.aud-foot .chev {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.aud-card:hover .chev {
+  background: var(--aud-color);
+  border-color: var(--aud-color);
+  color: var(--bg);
+  transform: rotate(-45deg);
+}
+
+/* ---------- CTA ---------- */
+.cta {
+  background: var(--bg);
+  padding: clamp(80px, 10vw, 140px) 0;
+  border-top: 1px solid var(--line);
+}
+.cta-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+.cta-card-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+.cta-card-primary h3 {
+  font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  max-width: 80%;
+}
+.cta-list { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+.cta-list a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  background: color-mix(in oklab, var(--accent-ink) 12%, transparent);
+  color: var(--accent-ink);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.cta-list a:hover { background: color-mix(in oklab, var(--accent-ink) 22%, transparent); }
+.cta-card-secondary {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cta-card-secondary h3 {
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+.cta-card-secondary p { color: var(--ink-dim); max-width: 420px; margin-bottom: 28px; }
+.cta-contact {
+  display: flex; flex-direction: column; gap: 10px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--ink-dim);
+}
+.cta-contact a { border-bottom: 1px solid var(--line); padding-bottom: 6px; display: inline-block; }
+.cta-contact a:hover { color: var(--accent); border-color: var(--accent); }
+.gears {
+  position: absolute;
+  right: -40px; bottom: -40px;
+  width: 280px; height: 280px;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .hero-grid, .cta-grid { grid-template-columns: 1fr; }
+  .stat-grid, .news-grid, .audience-grid { grid-template-columns: 1fr; }
+  .rank-row { grid-template-columns: 40px 1fr 60px; gap: 12px; padding: 16px; }
+  .rank-row > :nth-child(3), .rank-row > :nth-child(4), .rank-row > :nth-child(5), .rank-row > :nth-child(6) { display: none; }
+  .rank-row.head { display: none; }
+}
+</style>
+</head>
+<body data-screen-label="01 Trang chủ">
+<header class="nav" data-nav></header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true"><canvas id="neuralCanvas"></canvas></div>
+    <div class="container hero-grid">
+      <div>
+        <span class="hero-eyebrow"><span class="dot"></span>Phiên bản 2026 · cập nhật hàng tuần</span>
+        <h1 data-tweak="heroTitle">La Bàn AI</h1>
+        <p class="sub" data-tweak="heroSub">Ai đang thay đổi cách chúng ta học, làm việc và ra quyết định mỗi ngày. Giữa hàng trăm công cụ, đâu là lựa chọn phù hợp?</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#rankings">Tìm hiểu ngay →</a>
+          <a class="btn btn-ghost" href="#audience">Tôi là ai?</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hv-compass">
+          <svg viewBox="0 0 200 200" fill="none">
+            <g class="compass-ring">
+              <circle cx="100" cy="100" r="96" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+              <circle cx="100" cy="100" r="72" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+              <circle cx="100" cy="100" r="48" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
+            </g>
+            <g class="compass-ticks" stroke="currentColor" stroke-width="0.5" opacity="0.4">
+              <line x1="100" y1="4" x2="100" y2="20"/>
+              <line x1="100" y1="180" x2="100" y2="196"/>
+              <line x1="4" y1="100" x2="20" y2="100"/>
+              <line x1="180" y1="100" x2="196" y2="100"/>
+            </g>
+            <g class="compass-needle">
+              <path d="M100 30 L110 100 L100 170 L90 100 Z" fill="var(--accent)" opacity="0.9"/>
+            </g>
+            <circle cx="100" cy="100" r="4" fill="var(--ink)"/>
+            <text x="100" y="14" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="currentColor">N</text>
+          </svg>
+        </div>
+        <span class="hv-tag">đang dẫn đường</span>
+        <div class="hv-body">
+          <h3>Không phải AI nào cũng giống nhau</h3>
+          <p>La Bàn giúp bạn phân biệt — theo mục đích, đối tượng, và bối cảnh Việt Nam.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats" id="stats">
+    <div class="container">
+      <div class="stats-head">
+        <h2>AI đã có mặt — <span style="color:var(--accent)">bạn có đang cưỡi đúng con sóng?</span></h2>
+        <p>Những con số mới nhất về cách người Việt và thế giới đang sử dụng AI trong học tập và công việc.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div>
+            <div class="num">78<span class="unit">%</span></div>
+          </div>
+          <div>
+            <h3>Giáo viên đã dùng AI</h3>
+            <p>Người Mỹ dạy học trong 3 tháng qua có sử dụng ít nhất một công cụ AI để soạn bài, chấm bài hoặc hỗ trợ lớp học.</p>
+            <div class="src">Nguồn · Gallup 2024</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div>
+            <div class="num">65<span class="unit">%</span></div>
+          </div>
+          <div>
+            <h3>Phụ huynh tin AI giúp con</h3>
+            <p>Phụ huynh có con trong độ tuổi đi học cho rằng AI có thể hỗ trợ con học hiệu quả hơn — nếu được hướng dẫn đúng.</p>
+            <div class="src">Nguồn · Common Sense Media</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div>
+            <div class="num">23.5<span class="unit">%</span></div>
+          </div>
+          <div>
+            <h3>Dân số VN dùng AI</h3>
+            <p>Người Việt Nam đã và đang sử dụng ít nhất một công cụ AI (ChatGPT, Gemini, Canva…) trong sinh hoạt hoặc học tập.</p>
+            <div class="src">Nguồn · DataReportal 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWS -->
+      <div style="margin-top:96px">
+        <div class="stats-head" style="margin-bottom:0">
+          <h2>Cập nhật <span style="color:var(--accent)">A.I.</span></h2>
+          <p>Những câu chuyện nổi bật về AI trong giáo dục, được chọn lọc từ báo chí trong và ngoài nước.</p>
+        </div>
+        <div class="news-grid">
+          <a class="news" href="#">
+            <div class="thumb" style="background-image:url('assets/img/news-tphcm-classroom.jpg')"></div>
+            <div class="badge">VOV · 04/2026</div>
+            <h3>170 trường tại TP.HCM thí điểm đưa AI vào lớp học, học sinh tự huấn luyện chatbot</h3>
+            <div class="meta">Năm học 2025–2026 · đọc 4 phút</div>
+          </a>
+          <a class="news" href="#">
+            <div class="thumb" style="background-image:url('assets/img/news-teacher-planning.jpg')"></div>
+            <div class="badge">Vietnamnet · 11/2025</div>
+            <h3>76% giáo viên phổ thông Việt Nam đã dùng AI — nhưng hơn 60% là tự học, tự mò</h3>
+            <div class="meta">Khảo sát Viện KHGDVN · đọc 6 phút</div>
+          </a>
+          <a class="news" href="#">
+            <div class="thumb" style="background-image:url('assets/img/news-student-thoughtful.jpg?v=2')"></div>
+            <div class="badge">Vietnamnet · 10/2025</div>
+            <h3>"Thầy dùng AI để dạy, trò dùng AI để học" — cảnh báo về giới hạn của công nghệ</h3>
+            <div class="meta">Phân tích · đọc 5 phút</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RANKINGS -->
+  <section class="rankings" id="rankings">
+    <div class="container">
+      <div class="stats-head">
+        <h2><span class="eyebrow" style="display:block;margin-bottom:16px">Xếp hạng tuần này</span>Top công cụ AI <span style="color:var(--accent)">theo nhu cầu</span></h2>
+        <p>Không có AI "tốt nhất" — chỉ có AI phù hợp nhất với bạn. Xếp hạng được cập nhật dựa trên trải nghiệm thực tế của cộng đồng người Việt.</p>
+      </div>
+      <div class="rank-table">
+        <div class="rank-row head">
+          <div>#</div>
+          <div>Công cụ</div>
+          <div>Ứng dụng</div>
+          <div>Dễ dùng</div>
+          <div>Đối tượng</div>
+          <div>Lý do</div>
+          <div></div>
+        </div>
+        <a class="rank-row top" href="chatgpt.html">
+          <div class="rank-num">01</div>
+          <div class="tool-name"><div class="tool-logo" style="background:#10a37f;color:white">G</div>ChatGPT</div>
+          <div>Viết, gợi ý, tóm tắt, brainstorm</div>
+          <div class="stars">★★★★<span class="dim">★</span></div>
+          <div>Tất cả</div>
+          <div>Cần kiểm chứng thông tin</div>
+          <div class="arrow">→</div>
+        </a>
+        <a class="rank-row" href="#">
+          <div class="rank-num">02</div>
+          <div class="tool-name"><div class="tool-logo" style="background:linear-gradient(135deg,#4285F4,#9B72CB);color:white">G</div>Gemini</div>
+          <div>Tra cứu, tóm tắt, đọc tài liệu</div>
+          <div class="stars">★★★★<span class="dim">★</span></div>
+          <div>Tất cả</div>
+          <div>Tích hợp Google, miễn phí</div>
+          <div class="arrow">→</div>
+        </a>
+        <a class="rank-row" href="#">
+          <div class="rank-num">03</div>
+          <div class="tool-name"><div class="tool-logo" style="background:#00C4CC;color:white">C</div>Canva AI</div>
+          <div>Thiết kế slide, ảnh, video</div>
+          <div class="stars">★★★<span class="dim">★★</span></div>
+          <div>Học sinh, giáo viên</div>
+          <div>Giao diện trực quan, kho mẫu</div>
+          <div class="arrow">→</div>
+        </a>
+        <a class="rank-row" href="#">
+          <div class="rank-num">04</div>
+          <div class="tool-name"><div class="tool-logo" style="background:#D97757;color:white">A</div>Claude</div>
+          <div>Viết dài, phân tích tài liệu</div>
+          <div class="stars">★★★★<span class="dim">★</span></div>
+          <div>Giáo viên, nghiên cứu</div>
+          <div>Phân tích văn bản tốt</div>
+          <div class="arrow">→</div>
+        </a>
+        <a class="rank-row" href="#">
+          <div class="rank-num">05</div>
+          <div class="tool-name"><div class="tool-logo" style="background:#7C3AED;color:white">K</div>Khanmigo</div>
+          <div>Gia sư ảo, hướng dẫn học</div>
+          <div class="stars">★★★<span class="dim">★★</span></div>
+          <div>Học sinh, phụ huynh</div>
+          <div>An toàn cho trẻ em</div>
+          <div class="arrow">→</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCE PICKER -->
+  <section class="audience" id="audience">
+    <div class="container">
+      <div class="stats-head">
+        <h2>AI <span style="color:var(--accent)">cho ai?</span></h2>
+        <p>Mỗi người học, mỗi phụ huynh, mỗi nhà giáo có những nhu cầu khác nhau. Chọn vai trò của bạn để La Bàn dẫn đường.</p>
+      </div>
+      <div class="audience-grid">
+        <a class="aud-card" href="giao-vien.html" style="--aud-color: oklch(0.72 0.18 45)">
+          <span class="aud-label">→ 01 · Người dạy</span>
+          <h3 class="aud-title"><span class="en">For Teachers</span>Giáo viên</h3>
+          <div class="aud-foot">
+            <span>Soạn bài · chấm bài · lớp học tương tác</span>
+            <span class="chev">↗</span>
+          </div>
+        </a>
+        <a class="aud-card" href="phu-huynh.html" style="--aud-color: oklch(0.72 0.14 200)">
+          <span class="aud-label">→ 02 · Người đồng hành</span>
+          <h3 class="aud-title"><span class="en">For Parents</span>Phụ huynh</h3>
+          <div class="aud-foot">
+            <span>Theo dõi · hỗ trợ · kiểm soát an toàn</span>
+            <span class="chev">↗</span>
+          </div>
+        </a>
+        <a class="aud-card" href="hoc-sinh.html" style="--aud-color: oklch(0.78 0.15 140)">
+          <span class="aud-label">→ 03 · Người học</span>
+          <h3 class="aud-title"><span class="en">For Students</span>Học sinh</h3>
+          <div class="aud-foot">
+            <span>Học tập · luyện tập · sáng tạo</span>
+            <span class="chev">↗</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="cta">
+    <div class="container cta-grid">
+      <div class="cta-card-primary">
+        <h3>Học cùng InnovatEd Space.</h3>
+        <div class="cta-list">
+          <a href="https://innovatedspace.org/" target="_blank">
+            <span>Workshop trực tiếp</span><span>→</span>
+          </a>
+          <a href="https://innovatedspace.org/" target="_blank">
+            <span>Webinar online hàng tháng</span><span>→</span>
+          </a>
+          <a href="https://innovatedspace.org/" target="_blank">
+            <span>Góc học liệu mở</span><span>→</span>
+          </a>
+          <a href="https://innovatedspace.org/" target="_blank">
+            <span>Cộng đồng giáo viên AI</span><span>→</span>
+          </a>
+        </div>
+      </div>
+      <div class="cta-card-secondary">
+        <svg class="gears" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="35" cy="50" r="18" stroke="currentColor" stroke-width="1"/>
+          <circle cx="35" cy="50" r="8" stroke="currentColor" stroke-width="1"/>
+          <circle cx="70" cy="35" r="12" stroke="currentColor" stroke-width="1"/>
+          <circle cx="70" cy="35" r="5" stroke="currentColor" stroke-width="1"/>
+          <circle cx="75" cy="70" r="14" stroke="currentColor" stroke-width="1"/>
+          <circle cx="75" cy="70" r="6" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <h3>Tiến xa <span style="color:var(--accent)">hơn.</span></h3>
+        <p>Bạn không cần biết hết về AI để bắt đầu. Chỉ cần một người đồng hành đúng để cùng bạn lựa chọn, thử nghiệm và tìm công cụ phù hợp nhất.</p>
+        <div class="cta-contact">
+          <a href="https://innovatedspace.org/" target="_blank">→ innovatedspace.org</a>
+          <a href="mailto:contact@innovatedspace.org">→ contact@innovatedspace.org</a>
+          <span style="color:var(--ink-mute)">Hà Nội · TP. Hồ Chí Minh · Online</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer" data-footer></footer>
+
+<script src="assets/shared.js?v=2"></script>
+<script>LaBanAI.init("home");</script>
+<script>
+(function neuralNet(){
+  const canvas = document.getElementById('neuralCanvas');
+  if (!canvas) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = canvas.getContext('2d');
+  const host = canvas.parentElement; // .hero-bg (full hero section)
+  let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  // Parse any CSS color via the browser, with fallback
+  const _parseEl = document.createElement('span');
+  _parseEl.style.display = 'none';
+  document.body.appendChild(_parseEl);
+  function parseColor(cssColor, fallback) {
+    try {
+      _parseEl.style.color = '';
+      _parseEl.style.color = cssColor;
+      const c = getComputedStyle(_parseEl).color; // -> rgb(r,g,b) or rgba(...)
+      const m = c.match(/rgba?\(([^)]+)\)/i);
+      if (m) {
+        const parts = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);
+        if (parts.length >= 3 && parts.every(n => Number.isFinite(n))) {
+          return [parts[0]|0, parts[1]|0, parts[2]|0];
+        }
+      }
+    } catch(e) {}
+    return fallback;
+  }
+  function getAccentRgb() {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    return parseColor(v || '#FF6B35', [255,107,53]);
+  }
+  function getInkRgb() {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim();
+    return parseColor(v || '#0D0D0F', [13,13,15]);
+  }
+
+  const NODE_COUNT = 42;
+  const nodes = [];
+  const pulses = [];
+  let edges = [];
+  // Map "i-j" -> {heat: 0..1} so recently-pulsed edges glow
+  const edgeHeat = new Map();
+
+  function initNodes() {
+    nodes.length = 0;
+    for (let i = 0; i < NODE_COUNT; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        r: 1.2 + Math.random() * 1.8,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.6 + Math.random() * 0.8,
+        // independent wander targets
+        wanderX: Math.random() * Math.PI * 2,
+        wanderY: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  function edgeKey(a, b) { return a < b ? a + '-' + b : b + '-' + a; }
+
+  function resize() {
+    const rect = host.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    initNodes();
+  }
+
+  function spawnPulse() {
+    if (edges.length === 0) return;
+    const e = edges[Math.floor(Math.random() * edges.length)];
+    pulses.push({ a: e[0], b: e[1], t: 0, speed: 0.010 + Math.random() * 0.014 });
+    // Chain: sometimes continue from b to another neighbor to simulate cascading activation
+  }
+
+  let last = performance.now();
+  let pulseTimer = 0;
+
+  function draw(now) {
+    const dt = Math.min(32, now - last); last = now;
+    ctx.clearRect(0, 0, W, H);
+
+    const accentRgb = getAccentRgb();
+    const inkRgb = getInkRgb();
+    // For dark theme, ink is near-white; for light, near-black. We want lines to be accent + ink mix.
+    const inkIsDark = (inkRgb[0] + inkRgb[1] + inkRgb[2]) < 380;
+    const lineRgb = inkIsDark ? [140, 140, 150] : [220, 220, 230];
+
+    // Move nodes — organic wander with gentle pull toward center
+    const cx = W / 2, cy = H / 2;
+    for (const n of nodes) {
+      // wander (perlin-ish via sin/cos with slow-moving phase)
+      n.wanderX += 0.006;
+      n.wanderY += 0.0055;
+      n.vx += Math.sin(n.wanderX) * 0.018;
+      n.vy += Math.cos(n.wanderY) * 0.018;
+      // weak pull toward center so they don't all drift away
+      const dx = cx - n.x, dy = cy - n.y;
+      const d = Math.hypot(dx, dy) || 1;
+      n.vx += (dx / d) * 0.0012;
+      n.vy += (dy / d) * 0.0012;
+      // clamp speed + damping
+      const sp = Math.hypot(n.vx, n.vy);
+      const MAX_SP = 0.55;
+      if (sp > MAX_SP) { n.vx = (n.vx / sp) * MAX_SP; n.vy = (n.vy / sp) * MAX_SP; }
+      n.vx *= 0.985; n.vy *= 0.985;
+      n.x += n.vx; n.y += n.vy;
+      // wrap
+      if (n.x < -10) n.x = W + 10; else if (n.x > W + 10) n.x = -10;
+      if (n.y < -10) n.y = H + 10; else if (n.y > H + 10) n.y = -10;
+      n.phase += 0.03 * n.speed;
+    }
+
+    // cool down edge heat
+    for (const [k, v] of edgeHeat) {
+      v.heat *= 0.94;
+      if (v.heat < 0.02) edgeHeat.delete(k);
+    }
+
+    // Rebuild edges list each frame (cheap at 42 nodes)
+    edges = [];
+    const MAX_D = Math.min(W, H) * 0.32;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d = Math.hypot(dx, dy);
+        if (d < MAX_D) {
+          const t = 1 - d / MAX_D; // 0..1 closeness
+          edges.push([i, j, d]);
+          const k = edgeKey(i, j);
+          const heat = (edgeHeat.get(k) || {heat: 0}).heat;
+          // base dim line + accent-tinted heat overlay
+          ctx.strokeStyle = `rgba(${lineRgb[0]}, ${lineRgb[1]}, ${lineRgb[2]}, ${0.07 + t * 0.22})`;
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+          if (heat > 0.03) {
+            ctx.strokeStyle = `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, ${heat * 0.85})`;
+            ctx.lineWidth = 0.8 + heat * 1.6;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // Nodes
+    for (const n of nodes) {
+      const glow = 0.5 + 0.5 * Math.sin(n.phase);
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, ${0.35 + glow * 0.55})`;
+      ctx.arc(n.x, n.y, n.r + glow * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+      // halo
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, ${0.08 * glow})`;
+      ctx.arc(n.x, n.y, n.r + 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Pulses traveling along edges (data flowing through the network)
+    pulseTimer += dt;
+    if (pulseTimer > 260) { pulseTimer = 0; spawnPulse(); spawnPulse(); }
+
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      const p = pulses[i];
+      p.t += p.speed;
+      // Light up the edge while pulse travels
+      const k = edgeKey(p.a, p.b);
+      const curHeat = (edgeHeat.get(k) || {heat: 0}).heat;
+      edgeHeat.set(k, { heat: Math.max(curHeat, 1) });
+
+      if (p.t >= 1) {
+        // Chain: 50% chance to hop from b to a neighbor of b (cascading activation)
+        if (Math.random() < 0.55) {
+          const neighbors = edges.filter(e => e[0] === p.b || e[1] === p.b).map(e => e[0] === p.b ? e[1] : e[0]);
+          if (neighbors.length > 0) {
+            const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+            if (next !== p.a) {
+              pulses.push({ a: p.b, b: next, t: 0, speed: p.speed });
+            }
+          }
+        }
+        pulses.splice(i, 1); continue;
+      }
+      const a = nodes[p.a], b = nodes[p.b];
+      if (!a || !b) { pulses.splice(i, 1); continue; }
+      const x = a.x + (b.x - a.x) * p.t;
+      const y = a.y + (b.y - a.y) * p.t;
+      // trailing glow
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 14);
+      g.addColorStop(0, `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, 0.95)`);
+      g.addColorStop(1, `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, 0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(255,255,255,0.95)`;
+      ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(host);
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
